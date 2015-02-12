@@ -8,81 +8,130 @@ namespace WindowsFormsApplication7
 {
     class Chromosome
     {
-        public String code { get; set; }
-        private int length;
-        public int cost;
+        public String Code { get; set; }
+        public int Length { get; set; }
+        public int Fitness { get; set; }
+        public float mutationChance { get; set; }
 
-        private static Random randInit = new Random();
-        private static Random randMut = new Random();
-        private static Random randMut2 = new Random();
+        private Population population;
+        private static Random Rand = new Random();
 
-        public Chromosome(String code)
+        public Chromosome(String Code, Population pop, float mutationChance)
         {
-            this.code = code;
-            this.cost = 9999;
-            this.length = code.Length;
-            this.Randomize();
+            this.Code = Code;
+
+            this.Length = Code.Length;
+            this.Fitness = -1;
+            this.population = pop;
+            this.mutationChance = mutationChance;
+        }
+
+        public Chromosome(int Length, Population pop, float mutationChance)
+        {
+            this.Length = Length;
+            this.Fitness = -1;
+            this.population = pop;
+            this.mutationChance = mutationChance;
+            
+            Randomize();
         }
 
         public void Randomize() 
         {
             StringBuilder builder = new StringBuilder();
-            for (int i = 0; i < length; i++)
+
+            for (int i = 0; i < Length; ++i)
             {
-                builder.Append(Convert.ToChar(randInit.Next(256)));
+                char toAppend = Rand.NextDouble() > 0.5 ? '1' : '0';
+                builder.Append(toAppend);
             }
 
-            code = builder.ToString();
+            Code = builder.ToString();
         }
 
-        public int Cost(String compareTo)
+        public int CalcFitness(int WeightLimit)
         {
-            int total = 0;
+            int total = 0, weight = 0;
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < Length; ++i)
             {
-                total += Math.Abs(Convert.ToInt32(code.ToCharArray()[i]) - Convert.ToInt32(compareTo.ToCharArray()[i]));
+                if (Code[i].Equals('1'))
+                {
+                    weight += population.Data[i].Weight;
+                    total += population.Data[i].Value;
+                }
             }
 
-            cost = total;
-            return cost;
+            if (weight > WeightLimit)
+            {
+                total -= (weight - WeightLimit) * 50;
+            }
+
+            Fitness = total;
+
+            return Fitness;
         }
 
-        public String[] Mate(String partner)
+        public Chromosome[] Mate(Chromosome Partner)
         {
-            int pivot = length / 2 - 1;
+            int pivot = Rand.Next(Length);
+            String partnerCode = Partner.Code;
 
-            String child1 = code.Substring(0, pivot + 1) + partner.Substring(pivot + 1);
-            String child2 = partner.Substring(0, pivot + 1) + code.Substring(pivot + 1);
+            String child1 = Code.Substring(0, pivot + 1) + partnerCode.Substring(pivot + 1);
+            String child2 = partnerCode.Substring(0, pivot + 1) + Code.Substring(pivot + 1);
 
-            String [] retVal = {child1, child2};
+            Chromosome[] retVal = { new Chromosome(child1, population, mutationChance), new Chromosome(child2, population, mutationChance) };
             return retVal;
         }
 
         public void Mutate(double chance)
         {
-            double calcChance =  randMut.NextDouble();
-             if (chance > calcChance)
+            double calcChance =  Rand.NextDouble();
+             if (calcChance > chance)
                 return;
 
-            int index = randMut2.Next(length);
-            int inc = randMut.NextDouble() > 0.5 ? 1 : -1;
+            int index = Rand.Next(Length);
 
             StringBuilder builder = new StringBuilder();
 
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < Length; i++)
             {
                 if (i == index)
                 {
-                    char current = code.ToCharArray()[i];
-                    current += (char) inc;
+                    char current = Code.ToCharArray()[i];
+                    current = current.Equals('1') ? '0' : '1';
                     builder.Append(current);
                 }
                 else
-                    builder.Append(code[i]); 
+                    builder.Append(Code[i]); 
             }
 
-            code = builder.ToString();
+            Code = builder.ToString();
+
+        }
+
+        public int GetWeight()
+        {
+            int weight = 0;
+
+            for (int i = 0; i < Length; ++i)
+            {
+                weight += Int32.Parse(Code[i].ToString()) * population.Data[i].Weight;
+            }
+
+            return weight;
+        }
+
+        public int GetValue()
+        {
+            int val = 0;
+
+            for (int i = 0; i < Length; ++i)
+            {
+                val += Int32.Parse(Code[i].ToString()) * population.Data[i].Value;
+            }
+
+            return val;
         }
     }
 }

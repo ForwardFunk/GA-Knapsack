@@ -13,34 +13,31 @@ namespace WindowsFormsApplication7
     public partial class Form1 : Form
     {
 
-        private Population population;
+        private EvolutionEngine engine;
+
+        private const float mutationChance = 0.7f;
+        private const float elitism = 0.2f;
+        private const int numGenerations = 10000;
+        private const int numUnchanged = 1000;
+        private const int popSize = 20;
+        private const int weightLimit = 1000;
 
         public Form1()
         {
             InitializeComponent();
-
-            population = new Population("Hello World!");
+            engine = new EvolutionEngine();
+            engine.SetLblGenerations(lblGenerations);
+            engine.SetLblUnchanged(lblUnchanged);
+            engine.SetLblValue(lblValue);
+            engine.SetLblWeight(lblWeight);
+            engine.InitPopulation(mutationChance, elitism, popSize, weightLimit);
+            engine.SetNumGenerations(numGenerations);
+            engine.SetThreshold(numUnchanged);
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
-            int numGenerations = 10000;
-            //BackgroundWorker bw = new BackgroundWorker();
-
-            for (int i = 0; i < numGenerations; i++)
-            {
-                label1.Text = population.Evolution();
-
-            }
-            // what to do in the background thread
-            /*bw.DoWork += new DoWorkEventHandler(
-            delegate(object o, DoWorkEventArgs args)
-            {
-                BackgroundWorker b = o as BackgroundWorker;
-
-            });
-
-            bw.RunWorkerAsync();*/
+            engine.Generate();
         }
     }
 }
