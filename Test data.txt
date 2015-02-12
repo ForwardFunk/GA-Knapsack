@@ -1,0 +1,8 @@
+mutation = 0.7;
+elitism = 0.2;
+threshold = 1000;
+max # of generations = 10000;
+population size = 20;
+weight limit = 1000;
+
+w: 996 v: 5713

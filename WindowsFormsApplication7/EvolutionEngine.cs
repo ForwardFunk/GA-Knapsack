@@ -77,8 +77,8 @@ namespace WindowsFormsApplication7
                 lblWeight.Text = pop.GetTopWeight().ToString();
                 lblWeight.Update();
 
+                System.Threading.Thread.Sleep(1000);
                 numGen++;
-                System.Threading.Thread.Sleep(20);
             }
         }
     }

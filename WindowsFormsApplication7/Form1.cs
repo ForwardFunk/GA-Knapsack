@@ -15,17 +15,28 @@ namespace WindowsFormsApplication7
 
         private EvolutionEngine engine;
 
-        private const float mutationChance = 0.7f;
-        private const float elitism = 0.2f;
-        private const int numGenerations = 10000;
-        private const int numUnchanged = 1000;
-        private const int popSize = 20;
-        private const int weightLimit = 1000;
+        private float mutationChance = 0.7f;
+        private float elitism = 0.2f;
+        private int numGenerations = 10000;
+        private int numUnchanged = 1000;
+        private int popSize = 20;
+        private int weightLimit = 1000;
 
         public Form1()
         {
             InitializeComponent();
             engine = new EvolutionEngine();
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            numGenerations = Int32.Parse(textBox4.Text);
+            numUnchanged = Int32.Parse(textBox1.Text);
+            elitism = (float)Double.Parse(textBox2.Text);
+            mutationChance = (float)Double.Parse(textBox3.Text);
+            popSize = Int32.Parse(textBox5.Text);
+            weightLimit = Int32.Parse(textBox6.Text);
+
             engine.SetLblGenerations(lblGenerations);
             engine.SetLblUnchanged(lblUnchanged);
             engine.SetLblValue(lblValue);
@@ -33,11 +44,9 @@ namespace WindowsFormsApplication7
             engine.InitPopulation(mutationChance, elitism, popSize, weightLimit);
             engine.SetNumGenerations(numGenerations);
             engine.SetThreshold(numUnchanged);
-        }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
             engine.Generate();
         }
+
     }
 }
